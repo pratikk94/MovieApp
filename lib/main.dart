@@ -5,6 +5,9 @@ import 'package:flutter/rendering.dart';
 import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'package:movies_app/movie.dart';
+
+//Stateful and stateless widget -> Main3.
+
 void main() {
   runApp(MyApp());
 }
@@ -14,7 +17,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Movies app',
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -27,7 +30,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(title: 'Movies app'),
     );
   }
 }
@@ -52,6 +55,17 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
 
+  // Create a text controller and use it to retrieve the current value
+  // of the TextField.
+  final myController = TextEditingController();
+
+  @override
+  void dispose() {
+    // Clean up the controller when the widget is disposed.
+    myController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
@@ -64,12 +78,36 @@ class _MyHomePageState extends State<MyHomePage> {
         appBar: AppBar(
           // Here we take the value from the MyHomePage object that was created
           // by the App.build method, and use it to set our appbar title.
-          title: Text(widget.title),
+          title: Row(
+            children: [
+              SizedBox(
+                width: 100,
+                child: TextField(
+                    controller: myController,
+                    cursorColor: Colors.white
+                ),
+              ),
+              TextButton(
+                style: ButtonStyle(
+                  foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
+                ),
+                onPressed: () {
+                  //Spend time on stateful and stateless widget.
+                  setState(() {
+                    _getMovies(myController.text);
+                  });
+
+                },
+                child: Text('TextButton'),
+
+
+              )
+            ],
+          ),
         ),
         body: Container(
-
           child: FutureBuilder(
-            future: _getMovies(),
+            future: _getMovies(myController.text),
             builder: (BuildContext context,AsyncSnapshot snapshot){
 
               if(snapshot.data==null){
@@ -87,7 +125,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   itemCount: snapshot.data.length,
                   itemBuilder: (BuildContext context,int index){
                     return Container(
-                      color: Colors.grey,
+                      color: const Color(0xD3D3D3),
                       child: Column(
                         children: [
                           Row(
@@ -132,10 +170,10 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Future<List<Movie>> _getMovies() async{
+  Future<List<Movie>> _getMovies(String movieName) async{
 
     print("0 ->");
-    var url = Uri.parse("https://api.themoviedb.org/3/search/movie?api_key=753d7942043deaba39f0e512331e2414&language=en-US&query=Avengers&page=1&include_adult=false");
+    var url = Uri.parse("https://api.themoviedb.org/3/search/movie?api_key=753d7942043deaba39f0e512331e2414&language=en-US&query="+movieName+"&page=1&include_adult=false");
     List<Movie> movies = [];
 
     http.Response response = await http.get(url);
