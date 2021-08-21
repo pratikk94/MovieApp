@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'package:movies_app/movie.dart';
@@ -50,18 +51,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -73,8 +62,8 @@ class _MyHomePageState extends State<MyHomePage> {
     // than having to individually change instances of widgets.
     return Scaffold(
         appBar: AppBar(
-          // Here we take the value from the MyHomePage object that was created by
-          // the App.build method, and use it to set our appbar title.
+          // Here we take the value from the MyHomePage object that was created
+          // by the App.build method, and use it to set our appbar title.
           title: Text(widget.title),
         ),
         body: Container(
@@ -90,10 +79,49 @@ class _MyHomePageState extends State<MyHomePage> {
 
 
               return ListView.builder(
+                // gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                //     crossAxisCount: 2,
+                //     childAspectRatio: 0.75
+                // ),
                   itemCount: snapshot.data.length,
                   itemBuilder: (BuildContext context,int index){
-                    return ListTile(
-                      title: Text(snapshot.data[index].originalTitle),
+                    return Container(
+                      color: Colors.grey,
+                      child: Column(
+                        children: [
+                          Row(
+                              children: [
+                                ConstrainedBox(
+                                    constraints: BoxConstraints(
+                                      minWidth: 160,
+                                      minHeight: 160,
+                                      maxWidth: 160,
+                                      maxHeight: 160,
+                                    ),
+
+                                    child: Image.network("https://image.tmdb.org/t/p/w185/"+snapshot.data[index].posterPath, fit: BoxFit.contain)),
+
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.only(left: 8.0),
+                                        child: Text(snapshot.data[index].originalTitle,textAlign:TextAlign.start, style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold),maxLines: 1),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Text(snapshot.data[index].overview,textAlign:TextAlign.start, style: TextStyle(fontSize: 14),maxLines: 10),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+
+                              ]
+                          ),
+                          Divider(thickness: 5,)
+                        ],
+                      ),
                     );
                   }
               );
@@ -111,24 +139,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
     http.Response response = await http.get(url);
 
-    print("1 ->"+response.statusCode.toString());
-
-
     if (response.statusCode == 200) {
       String data = response.body;
       var jsonData = jsonDecode(data);
-      print("2- > " + jsonData["results"].length.toString());
-
-      print("Movie" + jsonData["results"][0].toString());
       for (var i = 0; i < jsonData["results"].length; i++) {
-        print(jsonData["results"][i]["id"].toString());
-
-        print(jsonData["results"][i]["backdrop_path"].toString());
-        print(jsonData["results"][i]["id"].toString());
-        print(jsonData["results"][i]["title"].toString());
-        print(jsonData["results"][i]["overview"].toString());
-        print(jsonData["results"][i]["poster_path"].toString());
-        print(i);
         if(jsonData["results"][i]["id"]!=null) {
           Movie m = Movie(
               jsonData["results"][i]["backdrop_path"].toString(),
@@ -141,7 +155,6 @@ class _MyHomePageState extends State<MyHomePage> {
       }
 
 
-      print("Movie length" + movies.length.toString());
 
     }
     return movies;
