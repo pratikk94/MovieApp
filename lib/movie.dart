@@ -9,6 +9,6 @@ class Movie{
   Movie(this.backdropPath,this.id,this.originalTitle,this.overview,this.posterPath);
 
   //fromJSON function.
-
+  //write function here
 
 }

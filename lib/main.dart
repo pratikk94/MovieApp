@@ -67,6 +67,7 @@ class _MyHomePageState extends State<MyHomePage> {
           title: Text(widget.title),
         ),
         body: Container(
+
           child: FutureBuilder(
             future: _getMovies(),
             builder: (BuildContext context,AsyncSnapshot snapshot){
